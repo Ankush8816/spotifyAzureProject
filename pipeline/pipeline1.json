@@ -136,7 +136,14 @@
 				"name": "update cdc",
 				"description": "used to update the cdc/last working day on cdc.json file",
 				"type": "Copy",
-				"dependsOn": [],
+				"dependsOn": [
+					{
+						"activity": "fetch maxdate",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -150,7 +157,11 @@
 						"type": "JsonSource",
 						"additionalColumns": [
 							{
-								"value": ""
+								"name": "cdc",
+								"value": {
+									"value": "@activity('fetch maxdate').output",
+									"type": "Expression"
+								}
 							}
 						],
 						"storeSettings": {
@@ -160,6 +171,15 @@
 						},
 						"formatSettings": {
 							"type": "JsonReadSettings"
+						}
+					},
+					"sink": {
+						"type": "JsonSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "JsonWriteSettings"
 						}
 					},
 					"enableStaging": false
@@ -174,13 +194,31 @@
 							"file": "empty.json "
 						}
 					}
+				],
+				"outputs": [
+					{
+						"referenceName": "cdc_json_file",
+						"type": "DatasetReference",
+						"parameters": {
+							"container": "bronze",
+							"folder": "cdc",
+							"file": "cdc.json"
+						}
+					}
 				]
 			},
 			{
 				"name": "fetch maxdate",
 				"description": "Script to fetch max date from the date column of the table",
 				"type": "Script",
-				"dependsOn": [],
+				"dependsOn": [
+					{
+						"activity": "load sql table to datalake",
+						"dependencyConditions": [
+							"Completed"
+						]
+					}
+				],
 				"policy": {
 					"timeout": "0.12:00:00",
 					"retry": 0,
@@ -196,7 +234,11 @@
 				"typeProperties": {
 					"scripts": [
 						{
-							"type": "Query"
+							"type": "Query",
+							"text": {
+								"value": "SELECT max(@{pipeline().parameters.column}) from @{pipeline().parameters.Schema}.@{pipeline().parameters.table}",
+								"type": "Expression"
+							}
 						}
 					],
 					"scriptBlockExecutionTimeout": "02:00:00"
