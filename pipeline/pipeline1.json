@@ -134,7 +134,7 @@
 			},
 			{
 				"name": "If Condition1",
-				"description": "agar koi record load hoga then only ",
+				"description": "agar koi record load hoga then only fetch max and update cdc run hoga otherwise jo parquet file bnegi vo delete krna hai kyuki usme koi record ni hai",
 				"type": "IfCondition",
 				"dependsOn": [
 					{
