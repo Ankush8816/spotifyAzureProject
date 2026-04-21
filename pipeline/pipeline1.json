@@ -31,7 +31,7 @@
 					"source": {
 						"type": "AzureSqlSource",
 						"sqlReaderQuery": {
-							"value": "SELECT * FROM @{pipeline().parameters.Schema}.@{pipeline().parameters.table} where @{pipeline().parameters.column} > '@{activity('fetching cdc').output.firstRow.cdc}'",
+							"value": "SELECT * FROM @{pipeline().parameters.Schema}.@{pipeline().parameters.table} where @{pipeline().parameters.column} > \n    '@{if(empty(pipeline().parameters.from_date),activity('fetching cdc').output.firstRow.cdc,pipeline().parameters.from_date)}'",
 							"type": "Expression"
 						},
 						"queryTimeout": "02:00:00",
@@ -309,6 +309,9 @@
 				"type": "string"
 			},
 			"column": {
+				"type": "string"
+			},
+			"from_date": {
 				"type": "string"
 			}
 		},
