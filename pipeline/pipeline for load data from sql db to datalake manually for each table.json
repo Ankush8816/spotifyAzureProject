@@ -1,5 +1,5 @@
 {
-	"name": "pipeline1",
+	"name": "pipeline for load data from sql db to datalake manually for each table",
 	"properties": {
 		"activities": [
 			{
